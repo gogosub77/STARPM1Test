@@ -44,7 +44,8 @@ namespace Test
             //自分のプロセスなら
             string myPath = Application.ExecutablePath;
 
-            //Target.exeで実行
+			//Target.exeで実行
+			string targetPaht = _app.Type<Application>().ExecutablePath;
         }
 
         //②
@@ -54,25 +55,33 @@ namespace Test
             //自分のプロセスなら
             int myCount = Application.OpenForms.Count;
 
-            //Target.exeで実行
+			//Target.exeで実行
+			int targetCount = 0;
+			targetCount = _app.Type<Application>().OpenForms.Count;
+			Assert.AreEqual(1, targetCount);
+
         }
 
         //③
         [TestMethod]
         public void 開いているフォームをアクティブにしてタイトル書き換え()
         {
-            //自分のプロセスでやるなら
-            //Form form = Application.OpenForms[0];
-            //form.Activate();
-            //form.Text = "abc";
+			//自分のプロセスでやるなら
+			//Form form = Application.OpenForms[0];
+			//form.Activate();
+			//form.Text = "abc";
+			var form = _app.Type<Application>().OpenForms[0];
+			form.Activate();
+			form.Text = "abc";
 
-            //Target.exeで実行
-        }
+			Assert.AreEqual("abc", (string)form.Text);
+			//Target.exeで実行
+		}
 
-        //★ここで説明
+		//★ここで説明
 
-        //④マウスダウン直呼び
-        [TestMethod]
+		//④マウスダウン直呼び
+		[TestMethod]
         public void マウスダウン直呼び()
         {
         }

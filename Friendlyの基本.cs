@@ -84,7 +84,15 @@ namespace Test
 		[TestMethod]
         public void マウスダウン直呼び()
         {
-        }
+			//シリアライズ可能なものしか送れない
+			var form = _app.Type<Application>().OpenForms[0];
+			//var e = new MouseEventArgs(MouseButtons.Left, 1, 10, 20, 1);
+			var e = _app.Type<MouseEventArgs>()(MouseButtons.Left, 1, 10, 20, 1);
+			form.OnMouseDown(e);
+
+			Assert.AreEqual("Left, click = 1, delta = 1, x = 10, y = 20",
+				(string)form._textBoxMouseInfo.Text);
+		}
 
         //⑤
         [TestMethod]

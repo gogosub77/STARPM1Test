@@ -90,6 +90,7 @@ namespace Test
 			var e = _app.Type<MouseEventArgs>()(MouseButtons.Left, 1, 10, 20, 1);
 			form.OnMouseDown(e);
 
+
 			Assert.AreEqual("Left, click = 1, delta = 1, x = 10, y = 20",
 				(string)form._textBoxMouseInfo.Text);
 		}
@@ -98,19 +99,42 @@ namespace Test
         [TestMethod]
         public void EnumFunc呼び出し()
         {
-        }
+			var form = _app.Type<Application>().OpenForms[0];
+			var e = _app.Type("Target.MyEnum").B;
+			string ret = form.EnumFunc(e);
+			Assert.AreEqual("B", ret);
+		}
 
         //⑥
         [TestMethod]
         public void DynamicAppTypeの書き方を4パターン写経()
         {
+			var t1 = _app.Type<Application>();
+			var t2 = _app.Type(typeof(Application));
+			var t3 = _app.Type("Target MyEnum");
+			var t4 = _app.Type().Target.MyEnum;
         }
 
         //➆
         [TestMethod]
         public void モーダルボタンを非同期でクリック()
         {
-        }
+			var form = _app.Type<Application>().OpenForms[0];
+			var async = new Async();
+
+			form._buttonModal.PerformClick(async);
+			//Button b;
+			//b.PerformClick
+			while(2 !=(int)_app.Type<Application>().OpenForms.Count)
+			{
+				Thread.Sleep(10);
+			}
+
+			var dig = _app.Type<Application>().OpenForms[1];
+			dig.Close();
+
+			async.WaitForCompletion();
+		}
 
         //⑧
         [TestMethod]

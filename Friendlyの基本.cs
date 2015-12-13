@@ -8,6 +8,8 @@ using Codeer.Friendly;
 using Codeer.Friendly.Dynamic;//★拡張メソッドを使うために必要
 using Codeer.Friendly.Windows;
 using System.Threading;
+using Ong.Friendly.FormsStandardControls;
+using Codeer.Friendly.Windows.Grasp;
 
 namespace Test
 {
@@ -125,7 +127,9 @@ namespace Test
 			form._buttonModal.PerformClick(async);
 			//Button b;
 			//b.PerformClick
-			while(2 !=(int)_app.Type<Application>().OpenForms.Count)
+			//画面が２つ立ち上がっているかチェックをする。
+			var wcount = (int)_app.Type<Application>().OpenForms.Count;
+			while (2 !=(int)_app.Type<Application>().OpenForms.Count)
 			{
 				Thread.Sleep(10);
 			}
@@ -144,30 +148,70 @@ namespace Test
             //ちなみに自分のプロセスのDateTimePickerに対してならこんな感じ
             //DateTimePicker _dateTimePicker = ...
             //_dateTimePicker.Value = new DateTime(2013, 11, 12);
+            var form = _app.Type<Application>().OpenForms[0];
+            var _dateTimePicker = form.
+            _dateTimePicker.Value = new DateTime(2013, 11, 12);
 
             //トラックバーを7に設定
             //ちなみに自分のプロセスのTrackBarにならこんな感じ
             //TrackBar _trackBar = ...
             //_trackBar.Value = 7;
+            var _trackBar = form._trackBar.Value = 7;
 
             //ボタンを押す
             //ちなみに自分のプロセスのButtonならこんな感じ
             //Button _buttonApply = ...
             //_buttonApply.PerformClick();
+            var _buttonApply = form._buttonApply.PerformClick();
 
             //フォームの持っている_dataフィールドの情報を取得
+            DateTime DateTime = form._data.DateTime;
+            int TrackValue = form._data.TrackValue;
+
+            Assert.AreEqual(new DateTime(2013, 11, 12), DateTime);
+            Assert.AreEqual(7, TrackValue);
+
         }
 
         //⑨
         [TestMethod]
         public void 最後の演習_Byコントロールドライバ()
         {
+
+            //日付を2013/11/12
+            //ちなみに自分のプロセスのDateTimePickerに対してならこんな感じ
+            //DateTimePicker _dateTimePicker = ...
+            //_dateTimePicker.Value = new DateTime(2013, 11, 12);
+            var form = _app.Type<Application>().OpenForms[0];
+            var _dataTimePicker = new FormsDateTimePicker(form._dateTimePicker);
+            var _trackBar = new FormsTrackBar(form._trackBar);
+            var _buttonApply = new FormsButton(form._buttonApply);
+
+            _dataTimePicker.EmulateSelectDay(new DateTime(2013, 11, 12));
+            _trackBar.EmulateChangeValue(7);
+            _buttonApply.EmulateClick();
+
+            //フォームの持っている_dataフィールドの情報を取得
+            DateTime DateTime = form._data.DateTime;
+            int TrackValue = form._data.TrackValue;
+            Assert.AreEqual(new DateTime(2013, 11, 12), DateTime);
+            Assert.AreEqual(7, TrackValue);
         }
 
         //⑩
         [TestMethod]
         public void モーダルボタンを非同期でクリック_Byコントロールドライバ()
         {
+            var form = _app.Type<Application>().OpenForms[0];
+            var w = new WindowControl (form);
+
+            var async = new Async();
+            form._buttonModal.PerformClick(async);
+
+            var dig = w.WaitForNextModal();
+            dig.Dynamic().Close();
+
+            async.WaitForCompletion();
         }
     }
 }
